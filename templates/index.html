@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Recommender System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-CjSoeD9OQmA6J7h7D3sbH4RJZBka36ojj52tki2ckUJWcVWs3yM2b0QeqC/6GrcS" crossorigin="anonymous"></script>
+    <style>
+        .text-white { color: white; }
+        .card { margin-bottom: 30px; display: flex; flex-direction: column; height: 100%; }
+        .card-body { flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
+        .card-img-top { width: 150px; height: 200px; object-fit: cover; margin: 0 auto; }
+    </style>
+</head>
+<body style="background-color:black">
+    <nav class="navbar" style="background-color:orange">
+        <a class="navbar-brand" href="/">My Book Recommender</a>
+        <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/recommend">Recommend</a></li>
+            <li><a href="/personalized">Personalized</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            {% if session.username %}
+                <li><a href="/profile">Welcome, {{ session.username }}</a></li>
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-info" style="margin-top: 20px;">
+                    <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="text-white" style="font-size:50px">Top 50 Books</h1>
+            </div>
+        </div>
+        <div class="row">
+            {% for i in range(book_name|length) %}
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <img src="{{ image[i] }}" class="img-responsive card-img-top" alt="Cover of {{ book_name[i] }}" onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default-placeholder.jpg') }}';">
+                            <h2 class="text-white">{{ book_name[i] }}</h2>
+                            <h4 class="text-white">{{ author[i] }}</h4>
+                            <h4 class="text-white">Votes: {{ votes[i] }}</h4>
+                            <h4 class="text-white">Rating: {{ rating[i]|round(1) }}</h4>
+                            {% if session.username %}
+                                <a href="/add_to_favorites/{{ book_name[i] }}" class="btn btn-primary" style="margin-top:10px">Add to Favorites</a>
+                            {% endif %}
+                            <a href="{{ url_for('book_detail', book_title=book_name[i]) }}" class="btn btn-info" style="margin-top:10px" target="_blank" >See Book</a> <!-- See Book button -->
+                        </div>
+                    </div>
+                </div>
+                {% if (i + 1) % 3 == 0 %}
+                    </div><div class="row">
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
